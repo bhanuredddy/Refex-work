@@ -133,6 +133,20 @@ nav{
 }
 .hstat-label{font-size:.72rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;font-weight:500}
 
+/* CAR ANIMATION */
+#car-anim{
+  position:absolute;
+  bottom:8%;left:0;
+  width:38%;max-width:580px;
+  mix-blend-mode:multiply;
+  pointer-events:none;z-index:1;
+  animation:carDrive 7s linear infinite;
+}
+@keyframes carDrive{
+  0%{transform:translateX(-110%);}
+  100%{transform:translateX(145vw);}
+}
+
 /* SCROLL INDICATOR */
 .scroll-hint{
   position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);
@@ -352,6 +366,7 @@ footer{
 <!-- HERO -->
 <section id="hero">
   <canvas id="hero-canvas"></canvas>
+  <img id="car-anim" src="images/car.png" alt="">
   <div class="hero-glow"></div>
   <div class="hero-glow2"></div>
   <div class="hero-content">
@@ -654,17 +669,9 @@ footer{
   const NODE_COUNT = 60;
   const MAX_DIST = 140;
 
-  // Car image
-  const carImg = new Image();
-  carImg.src = 'images/car.png';
-  const car = { x: -600, y: 0, speed: 2.2, w: 500, h: 160 };
-
   function resize(){
     W = canvas.width = canvas.offsetWidth;
     H = canvas.height = canvas.offsetHeight;
-    car.y = H * 0.55;
-    car.w = Math.max(460, W * 0.42);
-    car.h = car.w * 0.31;
   }
 
   function init(){
@@ -679,48 +686,6 @@ footer{
         alpha: Math.random()*.6+.2
       });
     }
-  }
-
-  function drawRoad(y){
-    const rg = ctx.createLinearGradient(0, y, 0, y+60);
-    rg.addColorStop(0,'rgba(10,18,40,0.85)');
-    rg.addColorStop(1,'rgba(6,10,20,0.0)');
-    ctx.fillStyle = rg;
-    ctx.fillRect(0, y, W, 60);
-
-    // Road lines
-    ctx.save();
-    ctx.setLineDash([40, 24]);
-    ctx.lineDashOffset = -(Date.now() / 14) % 64;
-    ctx.strokeStyle = 'rgba(79,142,247,0.22)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(0, y+20);
-    ctx.lineTo(W, y+20);
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  function drawCarGlow(x, y, w, h){
-    // Headlight beam
-    const beam = ctx.createLinearGradient(x+w, y+h*0.4, x+w+200, y+h*0.4);
-    beam.addColorStop(0,'rgba(200,225,255,0.18)');
-    beam.addColorStop(1,'rgba(200,225,255,0)');
-    ctx.fillStyle = beam;
-    ctx.beginPath();
-    ctx.moveTo(x+w, y+h*0.3);
-    ctx.lineTo(x+w+220, y+h*0.1);
-    ctx.lineTo(x+w+220, y+h*0.7);
-    ctx.lineTo(x+w, y+h*0.6);
-    ctx.closePath();
-    ctx.fill();
-
-    // Shadow under car
-    const sh = ctx.createRadialGradient(x+w/2, y+h+5, 0, x+w/2, y+h+5, w*0.5);
-    sh.addColorStop(0,'rgba(0,0,0,0.45)');
-    sh.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle = sh;
-    ctx.fillRect(x, y+h-10, w, 30);
   }
 
   function draw(){
@@ -753,53 +718,6 @@ footer{
       ctx.arc(a.x,a.y,a.r,0,Math.PI*2);
       ctx.fillStyle='rgba(79,142,247,'+a.alpha+')';
       ctx.fill();
-    }
-
-    // Road
-    drawRoad(car.y + car.h * 0.75);
-
-    // Car glow + image
-    car.x += car.speed;
-    if(car.x > W + 400) car.x = -car.w - 20;
-
-    drawCarGlow(car.x, car.y, car.w, car.h);
-
-    if(carImg.complete && carImg.naturalWidth > 0){
-      // Car already faces right — draw directly, no flip
-      ctx.drawImage(carImg, car.x, car.y, car.w, car.h);
-
-      // Spinning wheels overlay
-      const wheelR = car.h * 0.22;
-      const wheelY = car.y + car.h * 0.82;
-      const frontWheelX = car.x + car.w * 0.57;
-      const rearWheelX  = car.x + car.w * 0.28;
-      const angle = (Date.now() / 120) % (Math.PI * 2);
-
-      [frontWheelX, rearWheelX].forEach(wx => {
-        ctx.save();
-        ctx.translate(wx, wheelY);
-        // Dark tyre fill
-        ctx.beginPath();
-        ctx.arc(0, 0, wheelR, 0, Math.PI*2);
-        ctx.fillStyle = 'rgba(15,20,35,0.55)';
-        ctx.fill();
-        // Rotating spokes
-        for(let s = 0; s < 5; s++){
-          const a = angle + (s * Math.PI * 2 / 5);
-          ctx.beginPath();
-          ctx.moveTo(Math.cos(a)*wheelR*0.25, Math.sin(a)*wheelR*0.25);
-          ctx.lineTo(Math.cos(a)*wheelR*0.82, Math.sin(a)*wheelR*0.82);
-          ctx.strokeStyle = 'rgba(180,200,255,0.55)';
-          ctx.lineWidth = 2;
-          ctx.stroke();
-        }
-        // Hub
-        ctx.beginPath();
-        ctx.arc(0, 0, wheelR*0.22, 0, Math.PI*2);
-        ctx.fillStyle = 'rgba(120,160,255,0.7)';
-        ctx.fill();
-        ctx.restore();
-      });
     }
 
     requestAnimationFrame(draw);
