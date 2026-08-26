@@ -686,7 +686,7 @@ footer{
     for(let i = 0; i < NODE_COUNT; i++){
       nodes.push({
         x: Math.random() * W,
-        y: Math.random() * H,
+        y: Math.random() * H * 0.6,
         vx: (Math.random()-.5)*.4,
         vy: (Math.random()-.5)*.4,
         r: Math.random()*1.5+.5,
@@ -703,7 +703,7 @@ footer{
       const a = nodes[i];
       a.x += a.vx; a.y += a.vy;
       if(a.x<0||a.x>W) a.vx*=-1;
-      if(a.y<0||a.y>H) a.vy*=-1;
+      if(a.y<0||a.y>H*0.6) a.vy*=-1;
       for(let j=i+1;j<nodes.length;j++){
         const b = nodes[j];
         const dx=a.x-b.x, dy=a.y-b.y;
