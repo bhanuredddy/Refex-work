@@ -659,7 +659,7 @@ footer{
   function resize(){
     W = canvas.width = canvas.offsetWidth;
     H = canvas.height = canvas.offsetHeight;
-    car.y = H * 0.68;
+    car.y = H * 0.58;
     car.w = Math.max(260, W * 0.28);
     car.h = car.w * 0.53;
   }
@@ -762,7 +762,10 @@ footer{
     drawCarGlow(car.x, car.y, car.w, car.h);
 
     if(carImg.complete && carImg.naturalWidth > 0){
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
       ctx.drawImage(carImg, car.x, car.y, car.w, car.h);
+      ctx.restore();
     }
 
     requestAnimationFrame(draw);
