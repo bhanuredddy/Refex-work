@@ -762,7 +762,45 @@ footer{
     drawCarGlow(car.x, car.y, car.w, car.h);
 
     if(carImg.complete && carImg.naturalWidth > 0){
-      ctx.drawImage(carImg, car.x, car.y, car.w, car.h);
+      ctx.save();
+      // Flip horizontally so car faces right
+      ctx.translate(car.x + car.w, car.y);
+      ctx.scale(-1, 1);
+      ctx.drawImage(carImg, 0, 0, car.w, car.h);
+      ctx.restore();
+
+      // Spinning wheels overlay
+      const wheelR = car.h * 0.18;
+      const wheelY = car.y + car.h * 0.78;
+      const frontWheelX = car.x + car.w * 0.75;
+      const rearWheelX  = car.x + car.w * 0.22;
+      const angle = (Date.now() / 120) % (Math.PI * 2);
+
+      [frontWheelX, rearWheelX].forEach(wx => {
+        ctx.save();
+        ctx.translate(wx, wheelY);
+        // Dark tyre fill
+        ctx.beginPath();
+        ctx.arc(0, 0, wheelR, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(15,20,35,0.55)';
+        ctx.fill();
+        // Rotating spokes
+        for(let s = 0; s < 5; s++){
+          const a = angle + (s * Math.PI * 2 / 5);
+          ctx.beginPath();
+          ctx.moveTo(Math.cos(a)*wheelR*0.25, Math.sin(a)*wheelR*0.25);
+          ctx.lineTo(Math.cos(a)*wheelR*0.82, Math.sin(a)*wheelR*0.82);
+          ctx.strokeStyle = 'rgba(180,200,255,0.55)';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+        // Hub
+        ctx.beginPath();
+        ctx.arc(0, 0, wheelR*0.22, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(120,160,255,0.7)';
+        ctx.fill();
+        ctx.restore();
+      });
     }
 
     requestAnimationFrame(draw);
