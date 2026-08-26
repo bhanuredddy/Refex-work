@@ -642,7 +642,8 @@ footer{
 </footer>
 
 <script>
-// HERO CANVAS - Network/mobility constellation + car
+// HERO CANVAS - Network/mobility constellation + real car image
+
 (function(){
   const canvas = document.getElementById('hero-canvas');
   const ctx = canvas.getContext('2d');
@@ -650,14 +651,17 @@ footer{
   const NODE_COUNT = 60;
   const MAX_DIST = 140;
 
-  // Car state
-  const car = { x: -220, y: 0, speed: 1.8, scale: 1 };
+  // Car image
+  const carImg = new Image();
+  carImg.src = 'images/car.png';
+  const car = { x: -400, y: 0, speed: 2.2, w: 380, h: 200 };
 
   function resize(){
     W = canvas.width = canvas.offsetWidth;
     H = canvas.height = canvas.offsetHeight;
-    car.y = H * 0.72;
-    car.scale = Math.max(0.7, W / 1400);
+    car.y = H * 0.68;
+    car.w = Math.max(260, W * 0.28);
+    car.h = car.w * 0.53;
   }
 
   function init(){
@@ -675,165 +679,45 @@ footer{
   }
 
   function drawRoad(y){
-    // Road surface
-    const rg = ctx.createLinearGradient(0, y-10, 0, y+28);
-    rg.addColorStop(0,'rgba(20,28,50,0.0)');
-    rg.addColorStop(0.3,'rgba(20,28,50,0.7)');
+    const rg = ctx.createLinearGradient(0, y, 0, y+60);
+    rg.addColorStop(0,'rgba(10,18,40,0.85)');
     rg.addColorStop(1,'rgba(6,10,20,0.0)');
     ctx.fillStyle = rg;
-    ctx.fillRect(0, y-10, W, 38);
+    ctx.fillRect(0, y, W, 60);
 
-    // Dashed centre line
+    // Road lines
     ctx.save();
-    ctx.setLineDash([32, 20]);
-    ctx.lineDashOffset = -(Date.now() / 18) % 52;
-    ctx.strokeStyle = 'rgba(79,142,247,0.18)';
+    ctx.setLineDash([40, 24]);
+    ctx.lineDashOffset = -(Date.now() / 14) % 64;
+    ctx.strokeStyle = 'rgba(79,142,247,0.22)';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(0, y+9);
-    ctx.lineTo(W, y+9);
+    ctx.moveTo(0, y+20);
+    ctx.lineTo(W, y+20);
     ctx.stroke();
     ctx.restore();
   }
 
-  function drawCar(x, y, s){
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.scale(s, s);
-
-    // Glow under car
-    const glow = ctx.createRadialGradient(90, 22, 0, 90, 22, 110);
-    glow.addColorStop(0,'rgba(79,142,247,0.18)');
-    glow.addColorStop(1,'rgba(79,142,247,0)');
-    ctx.fillStyle = glow;
-    ctx.fillRect(-20, -10, 220, 50);
-
-    // Shadow
-    const sh = ctx.createRadialGradient(90, 28, 0, 90, 34, 80);
-    sh.addColorStop(0,'rgba(0,0,0,0.35)');
-    sh.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle = sh;
-    ctx.fillRect(10, 20, 160, 20);
-
-    // Car body
-    const bodyGrad = ctx.createLinearGradient(0, 0, 0, 22);
-    bodyGrad.addColorStop(0,'#1E3A6E');
-    bodyGrad.addColorStop(1,'#0F1F40');
-    ctx.fillStyle = bodyGrad;
-    ctx.beginPath();
-    ctx.roundRect(10, 8, 160, 22, 5);
-    ctx.fill();
-
-    // Roof / cabin
-    const roofGrad = ctx.createLinearGradient(0, -14, 0, 8);
-    roofGrad.addColorStop(0,'#253F70');
-    roofGrad.addColorStop(1,'#1A2E58');
-    ctx.fillStyle = roofGrad;
-    ctx.beginPath();
-    ctx.moveTo(42, 8);
-    ctx.lineTo(58, -14);
-    ctx.lineTo(128, -14);
-    ctx.lineTo(148, 8);
-    ctx.closePath();
-    ctx.fill();
-
-    // Windshield
-    ctx.fillStyle = 'rgba(100,160,255,0.25)';
-    ctx.beginPath();
-    ctx.moveTo(47, 7);
-    ctx.lineTo(60, -11);
-    ctx.lineTo(96, -11);
-    ctx.lineTo(96, 7);
-    ctx.closePath();
-    ctx.fill();
-    ctx.strokeStyle='rgba(79,142,247,0.4)';
-    ctx.lineWidth=.8;
-    ctx.stroke();
-
-    // Rear window
-    ctx.fillStyle = 'rgba(100,160,255,0.2)';
-    ctx.beginPath();
-    ctx.moveTo(100, 7);
-    ctx.lineTo(100, -11);
-    ctx.lineTo(126, -11);
-    ctx.lineTo(143, 7);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    // Wheels
-    function wheel(cx, cy){
-      // Tyre
-      ctx.beginPath();
-      ctx.arc(cx, cy, 13, 0, Math.PI*2);
-      ctx.fillStyle = '#0A0F1E';
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(79,142,247,0.5)';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      // Rim
-      ctx.beginPath();
-      ctx.arc(cx, cy, 7, 0, Math.PI*2);
-      const rg2 = ctx.createRadialGradient(cx-2,cy-2,0,cx,cy,7);
-      rg2.addColorStop(0,'#4F8EF7');
-      rg2.addColorStop(1,'#1A3060');
-      ctx.fillStyle = rg2;
-      ctx.fill();
-      // Spokes
-      for(let a=0;a<3;a++){
-        const ang = (Date.now()/200) + a*Math.PI*2/3;
-        ctx.beginPath();
-        ctx.moveTo(cx + Math.cos(ang)*2, cy + Math.sin(ang)*2);
-        ctx.lineTo(cx + Math.cos(ang)*6.5, cy + Math.sin(ang)*6.5);
-        ctx.strokeStyle='rgba(79,142,247,0.8)';
-        ctx.lineWidth=1.5;
-        ctx.stroke();
-      }
-    }
-    wheel(42, 28);
-    wheel(138, 28);
-
-    // Headlights
-    const hlg = ctx.createRadialGradient(170, 14, 0, 170, 14, 18);
-    hlg.addColorStop(0,'rgba(200,230,255,0.9)');
-    hlg.addColorStop(0.3,'rgba(79,142,247,0.5)');
-    hlg.addColorStop(1,'rgba(79,142,247,0)');
-    ctx.fillStyle = hlg;
-    ctx.fillRect(155, 5, 25, 20);
-
-    ctx.beginPath();
-    ctx.roundRect(167, 10, 6, 8, 2);
-    ctx.fillStyle = 'rgba(220,235,255,0.95)';
-    ctx.fill();
-
+  function drawCarGlow(x, y, w, h){
     // Headlight beam
-    ctx.save();
-    const beam = ctx.createLinearGradient(173, 14, 320, 14);
-    beam.addColorStop(0,'rgba(79,142,247,0.18)');
-    beam.addColorStop(1,'rgba(79,142,247,0)');
+    const beam = ctx.createLinearGradient(x+w, y+h*0.4, x+w+200, y+h*0.4);
+    beam.addColorStop(0,'rgba(200,225,255,0.18)');
+    beam.addColorStop(1,'rgba(200,225,255,0)');
     ctx.fillStyle = beam;
     ctx.beginPath();
-    ctx.moveTo(173, 10);
-    ctx.lineTo(320, -10);
-    ctx.lineTo(320, 30);
-    ctx.lineTo(173, 18);
+    ctx.moveTo(x+w, y+h*0.3);
+    ctx.lineTo(x+w+220, y+h*0.1);
+    ctx.lineTo(x+w+220, y+h*0.7);
+    ctx.lineTo(x+w, y+h*0.6);
     ctx.closePath();
     ctx.fill();
-    ctx.restore();
 
-    // Tail lights
-    ctx.beginPath();
-    ctx.roundRect(10, 10, 5, 8, 2);
-    ctx.fillStyle = 'rgba(239,68,68,0.85)';
-    ctx.fill();
-    // Tail glow
-    const tlg = ctx.createRadialGradient(10, 14, 0, 10, 14, 16);
-    tlg.addColorStop(0,'rgba(239,68,68,0.3)');
-    tlg.addColorStop(1,'rgba(239,68,68,0)');
-    ctx.fillStyle = tlg;
-    ctx.fillRect(-10, 5, 28, 20);
-
-    ctx.restore();
+    // Shadow under car
+    const sh = ctx.createRadialGradient(x+w/2, y+h+5, 0, x+w/2, y+h+5, w*0.5);
+    sh.addColorStop(0,'rgba(0,0,0,0.45)');
+    sh.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = sh;
+    ctx.fillRect(x, y+h-10, w, 30);
   }
 
   function draw(){
@@ -869,12 +753,17 @@ footer{
     }
 
     // Road
-    drawRoad(car.y + 18);
+    drawRoad(car.y + car.h * 0.75);
 
-    // Car
+    // Car glow + image
     car.x += car.speed;
-    if(car.x > W + 220) car.x = -220;
-    drawCar(car.x, car.y - 28, car.scale);
+    if(car.x > W + 400) car.x = -car.w - 20;
+
+    drawCarGlow(car.x, car.y, car.w, car.h);
+
+    if(carImg.complete && carImg.naturalWidth > 0){
+      ctx.drawImage(carImg, car.x, car.y, car.w, car.h);
+    }
 
     requestAnimationFrame(draw);
   }
