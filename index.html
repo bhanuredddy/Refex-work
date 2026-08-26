@@ -762,10 +762,7 @@ footer{
     drawCarGlow(car.x, car.y, car.w, car.h);
 
     if(carImg.complete && carImg.naturalWidth > 0){
-      ctx.save();
-      ctx.globalCompositeOperation = 'screen';
       ctx.drawImage(carImg, car.x, car.y, car.w, car.h);
-      ctx.restore();
     }
 
     requestAnimationFrame(draw);
