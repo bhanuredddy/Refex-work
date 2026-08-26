@@ -351,13 +351,18 @@ footer{
   .about-visual{height:250px}
   .impact-grid{grid-template-columns:repeat(2,1fr)}
 }
+@media(max-width:768px){
+  #hero{min-height:auto;}
+  #car-anim{display:none;}
+}
 @media(max-width:600px){
   nav{padding:0 1.5rem}
   section{padding:4rem 1.5rem}
-  #hero{padding:6rem 1.5rem 4rem}
+  #hero{padding:5rem 1.5rem 3rem;min-height:auto;}
   .hero-stats{gap:1.5rem}
   .impact-grid{grid-template-columns:1fr 1fr}
   .nav-links{display:none}
+  #car-anim{display:none;}
 }
 </style>
 
