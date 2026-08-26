@@ -654,14 +654,14 @@ footer{
   // Car image
   const carImg = new Image();
   carImg.src = 'images/car.png';
-  const car = { x: -400, y: 0, speed: 2.2, w: 380, h: 200 };
+  const car = { x: -600, y: 0, speed: 2.2, w: 500, h: 160 };
 
   function resize(){
     W = canvas.width = canvas.offsetWidth;
     H = canvas.height = canvas.offsetHeight;
-    car.y = H * 0.58;
-    car.w = Math.max(260, W * 0.28);
-    car.h = car.w * 0.53;
+    car.y = H * 0.55;
+    car.w = Math.max(460, W * 0.42);
+    car.h = car.w * 0.31;
   }
 
   function init(){
@@ -762,18 +762,14 @@ footer{
     drawCarGlow(car.x, car.y, car.w, car.h);
 
     if(carImg.complete && carImg.naturalWidth > 0){
-      ctx.save();
-      // Flip horizontally so car faces right
-      ctx.translate(car.x + car.w, car.y);
-      ctx.scale(-1, 1);
-      ctx.drawImage(carImg, 0, 0, car.w, car.h);
-      ctx.restore();
+      // Car already faces right — draw directly, no flip
+      ctx.drawImage(carImg, car.x, car.y, car.w, car.h);
 
       // Spinning wheels overlay
-      const wheelR = car.h * 0.18;
-      const wheelY = car.y + car.h * 0.78;
-      const frontWheelX = car.x + car.w * 0.75;
-      const rearWheelX  = car.x + car.w * 0.22;
+      const wheelR = car.h * 0.22;
+      const wheelY = car.y + car.h * 0.82;
+      const frontWheelX = car.x + car.w * 0.57;
+      const rearWheelX  = car.x + car.w * 0.28;
       const angle = (Date.now() / 120) % (Math.PI * 2);
 
       [frontWheelX, rearWheelX].forEach(wx => {
